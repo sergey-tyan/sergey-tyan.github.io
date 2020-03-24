@@ -1,19 +1,48 @@
 #board {
   width: 100%;
-  height: 100vh;
+  height: 90vh;
   position: relative;
   overflow: hidden;
   background-color: rgb(245, 247, 250);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .card {
-  width: 320px;
-  height: 320px;
+  width: 280px;
+  height: 550px;
   position: absolute;
-  top: 50%;
+  top: 30%;
   left: 50%;
   border-radius: 1%;
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.1);
   background-color: white;
   transform: translateX(-50%) translateY(-50%) scale(0.95);
+  background-size: 300px 450px;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 10px;
+  font-family: 'Fira Sans', sans-serif;
+  font-size: 14px;
+}
+
+strong {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+#show-picked {
+  z-index: 1;
+}
+
+#picked-movies {
+  background-color: antiquewhite;
+  border: 1px solid black;
+  display: block;
+  width: 300px;
+  padding: 5px;
+  z-index: 1;
 }

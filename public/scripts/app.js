@@ -1,13 +1,75 @@
+const board = document.getElementById('board');
+const showPickedButton = document.getElementById('show-picked');
+const pickedContainer = document.getElementById('picked-movies');
+
+showPickedButton.addEventListener('click', () => {
+  if (pickedContainer.style.display === 'none') {
+    pickedContainer.style.display = 'block';
+  } else {
+    pickedContainer.style.display = 'none';
+  }
+});
+
+const API_BASE = 'https://dev.jfhs.me';
 class Carousel {
   constructor(element) {
     this.board = element;
 
-    // add first two cards programmatically
-    this.push();
-    this.push();
+    this.init();
+    this.count = 0;
+    this.picked = [];
+  }
 
-    // handle gestures
+  async init() {
+    this.session = await this.loadMoviesToStart();
+    this.putAllMoviesToQueue();
+  }
+
+  async putAllMoviesToQueue() {
+    const movieInfos = await this.loadMovies(this.session.suggestions_queue);
+    movieInfos.forEach(movie => this.push(movie));
     this.handle();
+  }
+
+  async loadMovies(movieIds) {
+    return Promise.all(
+      movieIds.map(movieId =>
+        fetch(`${API_BASE}/api/movies/${movieId}`).then(r => r.json()),
+      ),
+    );
+  }
+
+  async loadMoviesToStart() {
+    return fetch(`${API_BASE}/api/explore`, { method: 'POST' }).then(r =>
+      r.json(),
+    );
+  }
+
+  async updateSession() {
+    this.session = await fetch(`${API_BASE}/api/explore/${this.session.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(this.session),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(r => r.json());
+
+    if (this.count === 6) {
+      this.putAllMoviesToQueue();
+      return;
+    }
+    if (this.count > 6) {
+      this.updateQueueWithLatestMovies();
+    }
+  }
+
+  async updateQueueWithLatestMovies() {
+    const movieInfos = await this.loadMovies(this.session.suggestions_queue);
+    const cards = this.board.querySelectorAll('.card');
+    for (let i = 0; i < cards.length - 2; i++) {
+      cards[i].remove();
+    }
+    movieInfos.forEach(movie => this.push(movie));
   }
 
   handle() {
@@ -142,37 +204,36 @@ class Carousel {
         this.nextCard.style.transition = 'transform 100ms linear';
 
       // check threshold
+      let direction = null;
       if (propX > 0.25 && e.direction == Hammer.DIRECTION_RIGHT) {
         successful = true;
+        direction = 'liked';
         // get right border position
         posX = this.board.clientWidth;
       } else if (propX < -0.25 && e.direction == Hammer.DIRECTION_LEFT) {
         successful = true;
+        direction = 'disliked';
         // get left border position
         posX = -(this.board.clientWidth + this.topCard.clientWidth);
       } else if (propY < -0.25 && e.direction == Hammer.DIRECTION_UP) {
         successful = true;
+        direction = 'picked';
         // get top border position
         posY = -(this.board.clientHeight + this.topCard.clientHeight);
-      }
-      let direction;
-      switch (e.direction) {
-        case Hammer.DIRECTION_RIGHT:
-          direction = 'right';
-          break;
-        case Hammer.DIRECTION_LEFT:
-          direction = 'left';
-          break;
-        case Hammer.DIRECTION_UP:
-          direction = 'up';
-          break;
-
-        default:
-          break;
       }
 
       if (successful) {
         console.log({ direction });
+        this.count++;
+        if (direction !== null) {
+          this.session[direction].push(e.target.id);
+          if (direction === 'picked') {
+            pickedContainer.innerHTML +=
+              e.target.getAttribute('title') + '<br>';
+          }
+
+          this.updateSession();
+        }
         // throw card in the chosen direction
         this.topCard.style.transform =
           'translateX(' +
@@ -187,8 +248,6 @@ class Carousel {
         setTimeout(() => {
           // remove swiped card
           this.board.removeChild(this.topCard);
-          // add new card
-          this.push();
           // handle gestures on new top card
           this.handle();
         }, 200);
@@ -203,16 +262,17 @@ class Carousel {
     }
   }
 
-  push() {
-    let card = document.createElement('div');
-
+  push(movie) {
+    console.log({ movie });
+    const card = document.createElement('div');
     card.classList.add('card');
-
-    card.style.backgroundImage =
-      "url('https://picsum.photos/320/320/?random=" +
-      Math.round(Math.random() * 1000000) +
-      "')";
-
+    card.id = movie.id;
+    card.setAttribute('title', movie.title);
+    card.style.backgroundImage = `url('https://image.tmdb.org/t/p/w300_and_h450_bestv2${movie.poster_path}')`;
+    card.innerHTML = `<strong>${movie.title}</strong>${movie.overview.substring(
+      0,
+      180,
+    )}...`;
     if (this.board.firstChild) {
       this.board.insertBefore(card, this.board.firstChild);
     } else {
@@ -220,7 +280,5 @@ class Carousel {
     }
   }
 }
-
-let board = document.getElementById('board');
 
 let carousel = new Carousel(board);
