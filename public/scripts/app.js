@@ -1,6 +1,9 @@
 const board = document.getElementById('board');
 const showPickedButton = document.getElementById('show-picked');
 const pickedContainer = document.getElementById('picked-movies');
+const dislikeButton = document.getElementById('dislike');
+const pickButton = document.getElementById('pick');
+const likeButton = document.getElementById('like');
 
 showPickedButton.addEventListener('click', () => {
   if (pickedContainer.style.display === 'none') {
@@ -17,7 +20,40 @@ class Carousel {
 
     this.init();
     this.count = 0;
-    this.picked = [];
+    this.movies = {};
+
+    likeButton.addEventListener('click', () => {
+      this.buttonClicked('liked');
+    });
+
+    pickButton.addEventListener('click', () => {
+      this.updatePickedList();
+      this.buttonClicked('picked');
+    });
+
+    dislikeButton.addEventListener('click', () => {
+      this.buttonClicked('disliked');
+    });
+  }
+
+  buttonClicked(type) {
+    const { id } = this.topCard;
+    this.count++;
+    this.session[type].push(id);
+    this.updateSession();
+    this.board.removeChild(this.topCard);
+    delete this.movies[id];
+    this.handle();
+  }
+
+  updatePickedList() {
+    const movie = this.movies[this.topCard.id];
+    const link = document.createElement('a');
+    link.href = `https://www.themoviedb.org/movie/${this.topCard.id}`;
+    link.innerText = movie.title;
+    pickedContainer.appendChild(link);
+    const br = document.createElement('br');
+    pickedContainer.appendChild(br);
   }
 
   async init() {
@@ -67,6 +103,8 @@ class Carousel {
     const movieInfos = await this.loadMovies(this.session.suggestions_queue);
     const cards = this.board.querySelectorAll('.card');
     for (let i = 0; i < cards.length - 2; i++) {
+      const id = cards[i].id;
+      delete this.movies[id];
       cards[i].remove();
     }
     movieInfos.forEach(movie => this.push(movie));
@@ -128,6 +166,12 @@ class Carousel {
       'translateX(-50%) translateY(-50%) rotate(0deg) rotateY(' +
       rotateY +
       'deg) scale(1)';
+    const movie = this.movies[this.topCard.id];
+    if (movie) {
+      movie.expanded = !movie.expanded;
+    }
+
+    this.updateCardState(this.topCard);
 
     // wait transition end
     setTimeout(() => {
@@ -226,10 +270,11 @@ class Carousel {
         console.log({ direction });
         this.count++;
         if (direction !== null) {
-          this.session[direction].push(e.target.id);
+          this.session[direction].push(this.topCard.id);
           if (direction === 'picked') {
-            pickedContainer.innerHTML +=
-              e.target.getAttribute('title') + '<br>';
+            this.updatePickedList();
+          } else {
+            delete this.movies[this.topCard.id];
           }
 
           this.updateSession();
@@ -246,9 +291,7 @@ class Carousel {
 
         // wait transition end
         setTimeout(() => {
-          // remove swiped card
           this.board.removeChild(this.topCard);
-          // handle gestures on new top card
           this.handle();
         }, 200);
       } else {
@@ -263,22 +306,79 @@ class Carousel {
   }
 
   push(movie) {
-    console.log({ movie });
+    this.movies[movie.id] = { ...movie, expanded: false };
     const card = document.createElement('div');
     card.classList.add('card');
     card.id = movie.id;
     card.setAttribute('title', movie.title);
-    card.style.backgroundImage = `url('https://image.tmdb.org/t/p/w300_and_h450_bestv2${movie.poster_path}')`;
-    card.innerHTML = `<strong>${movie.title}</strong>${movie.overview.substring(
-      0,
-      180,
-    )}...`;
+    this.updateCardState(card);
     if (this.board.firstChild) {
       this.board.insertBefore(card, this.board.firstChild);
     } else {
       this.board.append(card);
     }
   }
+
+  updateCardState(card) {
+    const movie = this.movies[card.id];
+    if (!movie) {
+      return;
+    }
+    const genresList = movie.genres.map(genre => genre.name).join(', ');
+
+    const header = `<strong>${movie.title}</strong>`;
+
+    if (movie.expanded) {
+      card.style.backgroundImage = '';
+      const countries = movie.countries
+        .map(code => countryCodeEmoji(code))
+        .join(' ');
+      const tagline = `<i>${movie.tagline}</i>`;
+      const genres = `<strong>Genres:</strong> ${genresList}`;
+      const from = `<strong>From: ${countries}</strong>`;
+      const release = `<strong>Release Date:</strong> ${movie.release_date}`;
+      const runtime = `<strong>Runtime:</strong> ${movie.runtime} min`;
+      const voteAverage = `<strong>Vote Average:</strong> ${movie.vote_average}`;
+      const voteCount = `<strong>Vote Count:</strong> ${movie.vote_count}`;
+      const data = [
+        header,
+        from,
+        genres,
+        release,
+        runtime,
+        voteAverage,
+        voteCount,
+        tagline,
+        movie.overview,
+      ];
+      card.innerHTML = '<p>' + data.join('<br>') + '</p>';
+      card.classList.add('card-expanded');
+    } else {
+      card.style.backgroundImage = `url('https://image.tmdb.org/t/p/w300_and_h450_bestv2${movie.poster_path}')`;
+      card.innerHTML = `${header}${movie.overview.substring(0, 140)}...`;
+      card.classList.remove('card-expanded');
+    }
+  }
 }
 
 let carousel = new Carousel(board);
+
+// country code regex
+const CC_REGEX = /^[a-z]{2}$/i;
+
+// offset between uppercase ascii and regional indicator symbols
+const OFFSET = 127397;
+
+function countryCodeEmoji(cc) {
+  if (!CC_REGEX.test(cc)) {
+    const type = typeof cc;
+    throw new TypeError(
+      `cc argument must be an ISO 3166-1 alpha-2 string, but got '${
+        type === 'string' ? cc : type
+      }' instead.`,
+    );
+  }
+
+  const chars = [...cc.toUpperCase()].map(c => c.charCodeAt() + OFFSET);
+  return String.fromCodePoint(...chars);
+}

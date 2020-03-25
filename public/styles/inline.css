@@ -30,12 +30,56 @@
   font-size: 14px;
 }
 
-strong {
-  font-family: Arial, Helvetica, sans-serif;
+.card-expanded {
+  justify-content: center;
 }
 
 #show-picked {
   z-index: 1;
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  top: 3vw;
+  left: 20vw;
+  border-radius: 50%;
+  font-size: 22px;
+}
+
+@media only screen and (max-width: 600px) {
+  .card {
+    width: 80vw;
+    height: 150vw;
+    top: 80vw;
+    left: 50%;
+    background-size: 86vw 126vw;
+    padding: 3vw;
+    font-size: 4.3vw;
+    border: 1px solid red;
+  }
+
+  #show-picked {
+    position: initial;
+    width: 15vw;
+    height: 10vw;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.1);
+    font-size: 3vw;
+    border-radius: 10%;
+  }
+}
+
+strong {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  margin-bottom: 10vw;
+}
+
+.emoji-button {
+  font-size: 10vw;
 }
 
 #picked-movies {
