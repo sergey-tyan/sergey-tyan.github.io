@@ -4,12 +4,15 @@ const pickedContainer = document.getElementById('picked-movies');
 const dislikeButton = document.getElementById('dislike');
 const pickButton = document.getElementById('pick');
 const likeButton = document.getElementById('like');
+const pickedCount = document.getElementById('picked-cnt');
 
 showPickedButton.addEventListener('click', () => {
-  if (pickedContainer.style.display === 'none') {
-    pickedContainer.style.display = 'block';
+  if (pickedContainer.classList.contains('visible')) {
+    showPickedButton.classList.remove('toggled');
+    pickedContainer.classList.remove('visible');
   } else {
-    pickedContainer.style.display = 'none';
+    showPickedButton.classList.add('toggled');
+    pickedContainer.classList.add('visible');
   }
 });
 
@@ -47,10 +50,14 @@ class Carousel {
   }
 
   updatePickedList() {
+    if (pickedContainer.innerText === 'Nothing yet') {
+      pickedContainer.innerHTML = '';
+    }
     const movie = this.movies[this.topCard.id];
     const link = document.createElement('a');
     link.href = `https://www.themoviedb.org/movie/${this.topCard.id}`;
     link.innerText = movie.title;
+    link.target = '_blank';
     pickedContainer.appendChild(link);
     const br = document.createElement('br');
     pickedContainer.appendChild(br);
@@ -82,6 +89,7 @@ class Carousel {
   }
 
   async updateSession() {
+    pickedCount.innerText = this.session.picked.length + '';
     this.session = await fetch(`${API_BASE}/api/explore/${this.session.id}`, {
       method: 'PUT',
       body: JSON.stringify(this.session),
@@ -124,7 +132,7 @@ class Carousel {
     if (this.cards.length > 0) {
       // set default top card position and scale
       this.topCard.style.transform =
-        'translateX(-50%) translateY(-50%) rotate(0deg) rotateY(0deg) scale(1)';
+        'translateX(0) translateY(0) rotate(0deg) rotateY(0deg) scale(1)';
 
       // destroy previous Hammer instance, if present
       if (this.hammer) this.hammer.destroy();
@@ -163,7 +171,7 @@ class Carousel {
 
     // rotate
     this.topCard.style.transform =
-      'translateX(-50%) translateY(-50%) rotate(0deg) rotateY(' +
+      'translateX(0) translateY(0) rotate(0deg) rotateY(' +
       rotateY +
       'deg) scale(1)';
     const movie = this.movies[this.topCard.id];
@@ -177,7 +185,7 @@ class Carousel {
     setTimeout(() => {
       // reset transform properties
       this.topCard.style.transform =
-        'translateX(-50%) translateY(-50%) rotate(0deg) rotateY(0deg) scale(1)';
+        'translateX(0) translateY(0) rotate(0deg) rotateY(0deg) scale(1)';
     }, 100);
   }
 
@@ -233,7 +241,7 @@ class Carousel {
     // scale next card
     if (this.nextCard)
       this.nextCard.style.transform =
-        'translateX(-50%) translateY(-50%) rotate(0deg) rotateY(0deg) scale(' +
+        'translateX(0) translateY(0) rotate(0deg) rotateY(0deg) scale(' +
         scale +
         ')';
 
@@ -297,10 +305,10 @@ class Carousel {
       } else {
         // reset cards position
         this.topCard.style.transform =
-          'translateX(-50%) translateY(-50%) rotate(0deg) rotateY(0deg) scale(1)';
+          'translateX(0) translateY(0) rotate(0deg) rotateY(0deg) scale(1)';
         if (this.nextCard)
           this.nextCard.style.transform =
-            'translateX(-50%) translateY(-50%) rotate(0deg) rotateY(0deg) scale(0.95)';
+            'translateX(0) translateY(0) rotate(0deg) rotateY(0deg) scale(0.95)';
       }
     }
   }
@@ -326,7 +334,7 @@ class Carousel {
     }
     const genresList = movie.genres.map(genre => genre.name).join(', ');
 
-    const header = `<strong>${movie.title}</strong>`;
+    const header = `<div class="movie-title">${movie.title}</div>`;
 
     if (movie.expanded) {
       card.style.backgroundImage = '';
@@ -351,11 +359,17 @@ class Carousel {
         tagline,
         movie.overview,
       ];
-      card.innerHTML = '<p>' + data.join('<br>') + '</p>';
+      card.innerHTML = '<div class="card-wrap"><p>' + data.join('<br>') + '</p></div>';
       card.classList.add('card-expanded');
     } else {
-      card.style.backgroundImage = `url('https://image.tmdb.org/t/p/w300_and_h450_bestv2${movie.poster_path}')`;
-      card.innerHTML = `${header}${movie.overview.substring(0, 140)}...`;
+      // card.style.backgroundImage = `url('https://image.tmdb.org/t/p/w300_and_h450_bestv2${movie.poster_path}')`;
+      card.innerHTML = `
+           <div class="card-wrap">
+             <div class="image" style="background-image: url('https://image.tmdb.org/t/p/w300_and_h450_bestv2${movie.poster_path}');"></div>
+             ${header}
+             <div class="overview">${movie.overview.substring(0, 140)}...</div>
+           </div>
+      `;
       card.classList.remove('card-expanded');
     }
   }

@@ -24,14 +24,21 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
 
-  <div id="board">
-    <div id="picked-movies" style="display: none;"></div>
+  <div class="wrapper">
+    <div class="header">
+      <div id="menu">Menu</div>
+      <div id="show-picked"><span class="arrow"></span> Picked: <span id="picked-cnt">0</span><span class="arrow"></span></div>
+      <div id="new-session">Start again</div>
+    </div>
+    <div id="board">
+    </div>
+
+    <div id="picked-movies">Nothing yet</div>
     <div class="buttons">
       <button id="dislike" class="emoji-button">🚫</button>
       <button id="pick" class="emoji-button">🆙</button>
       <button id="like" class="emoji-button">💚</button>
     </div>
-    <button id="show-picked">show picked</button>
   </div>
 
   <script src=" /scripts/app.js">
