@@ -1,19 +1,24 @@
 const board = document.getElementById('board');
-const showPickedButton = document.getElementById('show-picked');
-const pickedContainer = document.getElementById('picked-movies');
+const menuContent = document.getElementById('menu-content');
 const dislikeButton = document.getElementById('dislike');
 const pickButton = document.getElementById('pick');
 const likeButton = document.getElementById('like');
 const pickedCount = document.getElementById('picked-cnt');
+const pickedContainer = document.getElementById('picked-container');
 
-showPickedButton.addEventListener('click', () => {
-  if (pickedContainer.classList.contains('visible')) {
-    showPickedButton.classList.remove('toggled');
-    pickedContainer.classList.remove('visible');
+document.getElementById('menu').addEventListener('click', () => {
+  if (menuContent.classList.contains('visible')) {
+    menuContent.classList.remove('visible');
   } else {
-    showPickedButton.classList.add('toggled');
-    pickedContainer.classList.add('visible');
+    menuContent.classList.add('visible');
   }
+});
+
+document.getElementById('new-session').addEventListener('click', () => {
+  board.innerHTML = '';
+  pickedCount.innerText = '0';
+  pickedContainer.innerText = '';
+  new Carousel(board);
 });
 
 const API_BASE = 'https://dev.jfhs.me';
@@ -70,20 +75,20 @@ class Carousel {
 
   async putAllMoviesToQueue() {
     const movieInfos = await this.loadMovies(this.session.suggestions_queue);
-    movieInfos.forEach(movie => this.push(movie));
+    movieInfos.forEach((movie) => this.push(movie));
     this.handle();
   }
 
   async loadMovies(movieIds) {
     return Promise.all(
-      movieIds.map(movieId =>
-        fetch(`${API_BASE}/api/movies/${movieId}`).then(r => r.json()),
+      movieIds.map((movieId) =>
+        fetch(`${API_BASE}/api/movies/${movieId}`).then((r) => r.json()),
       ),
     );
   }
 
   async loadMoviesToStart() {
-    return fetch(`${API_BASE}/api/explore`, { method: 'POST' }).then(r =>
+    return fetch(`${API_BASE}/api/explore`, { method: 'POST' }).then((r) =>
       r.json(),
     );
   }
@@ -96,7 +101,7 @@ class Carousel {
       headers: {
         'Content-Type': 'application/json',
       },
-    }).then(r => r.json());
+    }).then((r) => r.json());
 
     if (this.count === 6) {
       this.putAllMoviesToQueue();
@@ -115,7 +120,7 @@ class Carousel {
       delete this.movies[id];
       cards[i].remove();
     }
-    movieInfos.forEach(movie => this.push(movie));
+    movieInfos.forEach((movie) => this.push(movie));
   }
 
   handle() {
@@ -148,10 +153,10 @@ class Carousel {
       );
 
       // pass events data to custom callbacks
-      this.hammer.on('tap', e => {
+      this.hammer.on('tap', (e) => {
         this.onTap(e);
       });
-      this.hammer.on('pan', e => {
+      this.hammer.on('pan', (e) => {
         this.onPan(e);
       });
     }
@@ -332,14 +337,14 @@ class Carousel {
     if (!movie) {
       return;
     }
-    const genresList = movie.genres.map(genre => genre.name).join(', ');
+    const genresList = movie.genres.map((genre) => genre.name).join(', ');
 
     const header = `<div class="movie-title">${movie.title}</div>`;
 
     if (movie.expanded) {
       card.style.backgroundImage = '';
       const countries = movie.countries
-        .map(code => countryCodeEmoji(code))
+        .map((code) => countryCodeEmoji(code))
         .join(' ');
       const tagline = `<i>${movie.tagline}</i>`;
       const genres = `<strong>Genres:</strong> ${genresList}`;
@@ -359,13 +364,16 @@ class Carousel {
         tagline,
         movie.overview,
       ];
-      card.innerHTML = '<div class="card-wrap"><p>' + data.join('<br>') + '</p></div>';
+      card.innerHTML =
+        '<div class="card-wrap"><p>' + data.join('<br>') + '</p></div>';
       card.classList.add('card-expanded');
     } else {
       // card.style.backgroundImage = `url('https://image.tmdb.org/t/p/w300_and_h450_bestv2${movie.poster_path}')`;
       card.innerHTML = `
            <div class="card-wrap">
-             <div class="image" style="background-image: url('https://image.tmdb.org/t/p/w300_and_h450_bestv2${movie.poster_path}');"></div>
+             <div class="image" style="background-image: url('https://image.tmdb.org/t/p/w300_and_h450_bestv2${
+               movie.poster_path
+             }');"></div>
              ${header}
              <div class="overview">${movie.overview.substring(0, 140)}...</div>
            </div>
@@ -375,7 +383,7 @@ class Carousel {
   }
 }
 
-let carousel = new Carousel(board);
+new Carousel(board);
 
 // country code regex
 const CC_REGEX = /^[a-z]{2}$/i;
@@ -393,6 +401,6 @@ function countryCodeEmoji(cc) {
     );
   }
 
-  const chars = [...cc.toUpperCase()].map(c => c.charCodeAt() + OFFSET);
+  const chars = [...cc.toUpperCase()].map((c) => c.charCodeAt() + OFFSET);
   return String.fromCodePoint(...chars);
 }

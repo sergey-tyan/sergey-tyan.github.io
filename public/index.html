@@ -26,14 +26,41 @@
 
   <div class="wrapper">
     <div class="header">
-      <div id="menu">Menu</div>
-      <div id="show-picked"><span class="arrow"></span> Picked: <span id="picked-cnt">0</span><span class="arrow"></span></div>
-      <div id="new-session">Start again</div>
+      <div id="menu" class="emoji-button">🍔</div>
+      <div id="menu-content" class="visible">
+        <div class="menu-content-container">
+          <section class="about">Pick-a-Movie is an app that helps you to choose a movie Lorem ipsum dolor sit, amet
+            consectetur adipisicing
+            elit. Illum magni odit error est ratione optio aut labore perspiciatis maiores voluptates suscipit harum
+            incidunt pariatur voluptatem adipisci, et ipsum ab totam?
+          </section>
+          <section>
+            <p>💚 or swipe right - you've liked the movie or you or you think that you might like it, but you are not
+              going to watch it now
+            </p>
+            <p>
+              🚫 or swipe left - you didn't like the movie or you didn't watch it (but you are not likely to watch it)
+            </p>
+            <p>
+              🆙 or swipe up - save movie to the list
+            </p>
+            <p>
+              🔄 - to restart the session and reset liked and disliked movies
+            </p>
+          </section>
+
+          Picked: <span id="picked-cnt">0</span>
+          <div id="picked-container">Nothing yet</div>
+        </div>
+
+      </div>
+
+      <div>Pick-a-Movie</div>
+      <div id="new-session" class="emoji-button">🔄</div>
     </div>
     <div id="board">
     </div>
 
-    <div id="picked-movies">Nothing yet</div>
     <div class="buttons">
       <button id="dislike" class="emoji-button">🚫</button>
       <button id="pick" class="emoji-button">🆙</button>

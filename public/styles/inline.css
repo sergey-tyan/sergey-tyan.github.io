@@ -3,6 +3,7 @@ body {
   margin: 0;
   width: 100vw;
   height: 100vh;
+  font-family: 'Fira Sans', sans-serif;
 }
 
 .wrapper {
@@ -38,33 +39,13 @@ body {
   margin: 15px;
 }
 
-/*.card {*/
-  /*width: 280px;*/
-  /*height: 550px;*/
-  /*position: absolute;*/
-  /*top: 30%;*/
-  /*left: 50%;*/
-  /*border-radius: 1%;*/
-  /*box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.1);*/
-  /*background-color: white;*/
-  /*transform: translateX(-50%) translateY(-50%) scale(0.95);*/
-  /*background-size: 300px 450px;*/
-  /*background-repeat: no-repeat;*/
-  /*display: flex;*/
-  /*flex-direction: column;*/
-  /*justify-content: flex-end;*/
-  /*padding: 10px;*/
-  /*font-family: 'Fira Sans', sans-serif;*/
-  /*font-size: 14px;*/
-/*}*/
-
 .card {
   position: absolute;
   top: 0;
   left: 0;
   background: white;
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.1);
-  font-family: 'Fira Sans', sans-serif;
+
   font-size: 14px;
   height: 100%;
   display: flex;
@@ -91,7 +72,7 @@ body {
 }
 
 .movie-title {
-font-weight: bold;
+  font-weight: bold;
 }
 
 .card-expanded {
@@ -99,18 +80,7 @@ font-weight: bold;
 }
 
 @media only screen and (max-width: 600px) {
-/*.card {*/
-    /*width: 80vw;*/
-    /*height: 150vw;*/
-    /*top: 80vw;*/
-    /*left: 50%;*/
-    /*background-size: 86vw 126vw;*/
-    /*padding: 3vw;*/
-    /*font-size: 4.3vw;*/
-    /*border: 1px solid red;*/
-  /*}*/
   .card {
-
   }
 }
 
@@ -128,19 +98,45 @@ strong {
   font-size: 10vw;
 }
 
-#picked-movies {
+/* #picked-movies {
   background-color: antiquewhite;
-  /*padding: 5px;*/
   z-index: 1;
   position: absolute;
   top: 18px;
   width: 100%;
   transition: 0.4s;
   transform: translateY(-100%);
-  /*display: none;*/
 }
 
 #picked-movies.visible {
-  /*display: block;*/
   transform: translateY(0);
+} */
+
+.header {
+  padding: 3vw 3vw 0 3vw;
+}
+
+#menu-content {
+  background-color: #fceed1;
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transition: 0.15s;
+  transform: translateX(-100%);
+}
+
+#menu-content.visible {
+  transform: translateX(0);
+}
+
+#menu {
+  z-index: 1;
+}
+
+.menu-content-container {
+  padding: 4vw;
+  font-size: 4vw;
+  margin-top: 10vh;
 }
