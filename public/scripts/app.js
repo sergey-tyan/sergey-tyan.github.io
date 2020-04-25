@@ -6,6 +6,13 @@ const likeButton = document.getElementById('like');
 const pickedCount = document.getElementById('picked-cnt');
 const pickedContainer = document.getElementById('picked-container');
 
+const hideMenu = localStorage.getItem('hideMenu');
+if (hideMenu) {
+  menuContent.classList.remove('visible');
+} else {
+  localStorage.setItem('hideMenu', true);
+}
+
 document.getElementById('menu').addEventListener('click', () => {
   if (menuContent.classList.contains('visible')) {
     menuContent.classList.remove('visible');
@@ -15,20 +22,22 @@ document.getElementById('menu').addEventListener('click', () => {
 });
 
 document.getElementById('new-session').addEventListener('click', () => {
+  if (window.localStorage) {
+    window.localStorage.removeItem('session');
+  }
   board.innerHTML = '';
   pickedCount.innerText = '0';
   pickedContainer.innerText = '';
-  new Carousel(board);
+  window.app = new Carousel(board);
 });
 
 const API_BASE = 'https://dev.jfhs.me';
 class Carousel {
   constructor(element) {
     this.board = element;
-
-    this.init();
     this.count = 0;
     this.movies = {};
+    this.init();
 
     likeButton.addEventListener('click', () => {
       this.buttonClicked('liked');
@@ -59,8 +68,12 @@ class Carousel {
       pickedContainer.innerHTML = '';
     }
     const movie = this.movies[this.topCard.id];
+    this.addMovieToPicked(movie);
+  }
+
+  addMovieToPicked(movie) {
     const link = document.createElement('a');
-    link.href = `https://www.themoviedb.org/movie/${this.topCard.id}`;
+    link.href = `https://www.themoviedb.org/movie/${movie.id}`;
     link.innerText = movie.title;
     link.target = '_blank';
     pickedContainer.appendChild(link);
@@ -69,7 +82,25 @@ class Carousel {
   }
 
   async init() {
-    this.session = await this.loadMoviesToStart();
+    const sessionRaw = window?.localStorage?.getItem('session');
+    if (sessionRaw) {
+      this.session = JSON.parse(sessionRaw);
+      this.count =
+        this.session.disliked.length +
+        this.session.liked.length +
+        this.session.picked.length;
+      pickedCount.innerText = this.session.picked.length + '';
+      if (this.session.picked.length > 0) {
+        pickedContainer.innerHTML = '';
+        const pickedMovieInfos = await this.loadMovies(this.session.picked);
+        pickedMovieInfos.forEach((movie) => this.addMovieToPicked(movie));
+      }
+    } else {
+      this.session = await this.loadMoviesToStart();
+      if (window.localStorage) {
+        window.localStorage.setItem('session', JSON.stringify(this.session));
+      }
+    }
     this.putAllMoviesToQueue();
   }
 
@@ -102,7 +133,9 @@ class Carousel {
         'Content-Type': 'application/json',
       },
     }).then((r) => r.json());
-
+    if (window.localStorage) {
+      window.localStorage.setItem('session', JSON.stringify(this.session));
+    }
     if (this.count === 6) {
       this.putAllMoviesToQueue();
       return;
@@ -383,7 +416,7 @@ class Carousel {
   }
 }
 
-new Carousel(board);
+window.app = new Carousel(board);
 
 // country code regex
 const CC_REGEX = /^[a-z]{2}$/i;
