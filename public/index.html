@@ -26,45 +26,60 @@
 
   <div class="wrapper">
     <div class="header">
-      <div id="menu" class="emoji-button">🍔</div>
-      <div id="menu-content" class="visible">
-        <div class="menu-content-container">
-          <section class="about">Pick-a-Movie is an app that helps you to choose a movie Lorem ipsum dolor sit, amet
-            consectetur adipisicing
-            elit. Illum magni odit error est ratione optio aut labore perspiciatis maiores voluptates suscipit harum
-            incidunt pariatur voluptatem adipisci, et ipsum ab totam?
-          </section>
-          <section>
-            <p>💚 or swipe right - you've liked the movie or you or you think that you might like it, but you are not
-              going to watch it now
-            </p>
-            <p>
-              🚫 or swipe left - you didn't like the movie or you didn't watch it (but you are not likely to watch it)
-            </p>
-            <p>
-              🆙 or swipe up - save movie to the list
-            </p>
-            <p>
-              🔄 - to restart the session and reset liked and disliked movies
-            </p>
-          </section>
-
-          Picked: <span id="picked-cnt">0</span>
-          <div id="picked-container">Nothing yet</div>
-        </div>
-
+      <div id="menu" class="emoji-button">
+        <ion-icon name="menu-outline"></ion-icon>
       </div>
 
-      <div>Pick-a-Movie</div>
-      <div id="new-session" class="emoji-button">🔄</div>
+
+      <div class="title">Pick-a-Movie</div>
+      <div id="new-session" class="emoji-button">
+        <ion-icon name="refresh-outline"></ion-icon>
+      </div>
+    </div>
+
+    <div id="menu-content" class="visible">
+      <div class="menu-content-container">
+        <section class="about">Pick-a-Movie is an app that helps you to choose a movie Lorem ipsum dolor sit, amet
+          consectetur adipisicing
+          elit. Illum magni odit error est ratione optio aut labore perspiciatis maiores voluptates suscipit harum
+          incidunt pariatur voluptatem adipisci, et ipsum ab totam?
+        </section>
+        <section>
+
+          <p>
+            <ion-icon name="heart"></ion-icon> or swipe right - you've liked the movie or you or you think that you
+            might like it, but you are not
+            going to watch it now
+          </p>
+          <p>
+            <ion-icon name="close-circle"></ion-icon> or swipe left - you didn't like the movie or you didn't watch it
+            (but you are not likely to watch it)
+          </p>
+          <p>
+            <ion-icon name="bookmark"></ion-icon> or swipe up - save movie to the list
+          </p>
+          <p>
+            <ion-icon name="refresh-outline"></ion-icon> - to restart the session and reset liked and disliked movies
+          </p>
+        </section>
+
+        Picked: <span id="picked-cnt">0</span>
+        <div id="picked-container">Nothing yet</div>
+      </div>
     </div>
     <div id="board">
     </div>
 
     <div class="buttons">
-      <button id="dislike" class="emoji-button">🚫</button>
-      <button id="pick" class="emoji-button">🆙</button>
-      <button id="like" class="emoji-button">💚</button>
+      <button id="dislike" class="emoji-button">
+        <ion-icon name="close-circle"></ion-icon>
+      </button>
+      <button id="pick" class="emoji-button">
+        <ion-icon name="bookmark"></ion-icon>
+      </button>
+      <button id="like" class="emoji-button">
+        <ion-icon name="heart"></ion-icon>
+      </button>
     </div>
   </div>
 
@@ -83,6 +98,8 @@
       });
     }
   </script>
+  <script src="https://unpkg.com/ionicons@5.0.0/dist/ionicons.js"></script>
+
 
 </body>
 
