@@ -386,6 +386,9 @@ class Carousel {
       const runtime = `<strong>Runtime:</strong> ${movie.runtime} min`;
       const voteAverage = `<strong>Vote Average:</strong> ${movie.vote_average}`;
       const voteCount = `<strong>Vote Count:</strong> ${movie.vote_count}`;
+      const trailer =
+        movie.trailer &&
+        `<iframe class="video" src="${movie.trailer}" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
       const data = [
         header,
         from,
@@ -396,7 +399,8 @@ class Carousel {
         voteCount,
         tagline,
         movie.overview,
-      ];
+        trailer,
+      ].filter(Boolean);
       card.innerHTML =
         '<div class="card-wrap"><p>' + data.join('<br>') + '</p></div>';
       card.classList.add('card-expanded');
