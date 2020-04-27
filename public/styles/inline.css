@@ -2,7 +2,7 @@ body {
   padding: 0;
   margin: 0;
   width: 100vw;
-  height: 100vh;
+  height: 85vh;
   font-family: 'Fira Sans', sans-serif;
   background-color: #f5f8df;
 }
@@ -64,12 +64,19 @@ body {
   background-repeat: no-repeat;
 }
 
-.movie-title {
-  font-weight: bold;
+.details {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.card-expanded {
-  justify-content: center;
+.video {
+  margin-top: 10px;
+}
+
+.movie-title {
+  font-weight: bold;
 }
 
 strong {

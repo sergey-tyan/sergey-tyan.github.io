@@ -357,7 +357,7 @@ class Carousel {
     card.classList.add('card');
     card.id = movie.id;
     card.setAttribute('title', movie.title);
-    this.updateCardState(card);
+    this.initCard(card);
     if (this.board.firstChild) {
       this.board.insertBefore(card, this.board.firstChild);
     } else {
@@ -365,57 +365,62 @@ class Carousel {
     }
   }
 
-  updateCardState(card) {
+  initCard(card) {
     const movie = this.movies[card.id];
     if (!movie) {
       return;
     }
-    const genresList = movie.genres.map((genre) => genre.name).join(', ');
-
     const header = `<div class="movie-title">${movie.title}</div>`;
+    const genresList = movie.genres.map((genre) => genre.name).join(', ');
+    const countries = movie.countries
+      .map((code) => countryCodeEmoji(code))
+      .join(' ');
+    const tagline = `<i>${movie.tagline}</i>`;
+    const genres = `<strong>Genres:</strong> ${genresList}`;
+    const from = `<strong>From: ${countries}</strong>`;
+    const release = `<strong>Release Date:</strong> ${movie.release_date}`;
+    const runtime = `<strong>Runtime:</strong> ${movie.runtime} min`;
+    const voteAverage = `<strong>Vote Average:</strong> ${movie.vote_average}`;
+    const voteCount = `<strong>Vote Count:</strong> ${movie.vote_count}`;
+    const trailer =
+      movie.trailer &&
+      `<iframe class="video" src="${movie.trailer}" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+    const data = [
+      header,
+      from,
+      genres,
+      release,
+      runtime,
+      voteAverage,
+      voteCount,
+      tagline,
+      movie.overview,
+      trailer,
+    ].filter(Boolean);
 
-    if (movie.expanded) {
-      card.style.backgroundImage = '';
-      const countries = movie.countries
-        .map((code) => countryCodeEmoji(code))
-        .join(' ');
-      const tagline = `<i>${movie.tagline}</i>`;
-      const genres = `<strong>Genres:</strong> ${genresList}`;
-      const from = `<strong>From: ${countries}</strong>`;
-      const release = `<strong>Release Date:</strong> ${movie.release_date}`;
-      const runtime = `<strong>Runtime:</strong> ${movie.runtime} min`;
-      const voteAverage = `<strong>Vote Average:</strong> ${movie.vote_average}`;
-      const voteCount = `<strong>Vote Count:</strong> ${movie.vote_count}`;
-      const trailer =
-        movie.trailer &&
-        `<iframe class="video" src="${movie.trailer}" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-      const data = [
-        header,
-        from,
-        genres,
-        release,
-        runtime,
-        voteAverage,
-        voteCount,
-        tagline,
-        movie.overview,
-        trailer,
-      ].filter(Boolean);
-      card.innerHTML =
-        '<div class="card-wrap"><p>' + data.join('<br>') + '</p></div>';
-      card.classList.add('card-expanded');
-    } else {
-      // card.style.backgroundImage = `url('https://image.tmdb.org/t/p/w300_and_h450_bestv2${movie.poster_path}')`;
-      card.innerHTML = `
-           <div class="card-wrap">
-             <div class="image" style="background-image: url('https://image.tmdb.org/t/p/w300_and_h450_bestv2${
-               movie.poster_path
-             }');"></div>
-             ${header}
-             <div class="overview">${movie.overview.substring(0, 140)}...</div>
-           </div>
-      `;
+    card.innerHTML = `
+      <div class="card-wrap">
+        <div class="image" style="background-image: url('https://image.tmdb.org/t/p/w300_and_h450_bestv2${
+          movie.poster_path
+        }');"></div>
+        ${header}
+        <div class="overview">${movie.overview.substring(0, 140)}...</div>
+      </div>
+      <div class="details" style="display: none;">
+        <p>${data.join('<br>')}</p>
+      </div>
+    `;
+  }
+
+  updateCardState(card) {
+    if (card.classList.contains('card-expanded')) {
+      card.querySelector('.details').style = 'display: none;';
+      card.querySelector('.card-wrap').style = 'display: flex;';
       card.classList.remove('card-expanded');
+    } else {
+      card.querySelector('.details').style = 'display: block;';
+      card.querySelector('.card-wrap').style = 'display: none;';
+      card.classList.add('card-expanded');
     }
   }
 }
